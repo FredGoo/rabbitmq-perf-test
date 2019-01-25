@@ -15,7 +15,6 @@
 
 package com.rabbitmq.perf;
 
-import com.rabbitmq.client.MissedHeartbeatException;
 import com.rabbitmq.client.ShutdownSignalException;
 import com.rabbitmq.client.impl.recovery.AutorecoveringConnection;
 import org.slf4j.Logger;
@@ -23,24 +22,23 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.SocketException;
-import java.util.function.Predicate;
 
 /**
  *
  */
 public abstract class AgentBase {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AgentBase.class);
+    private static final Logger logger = LoggerFactory.getLogger(AgentBase.class);
 
     protected void delay(long now, AgentState state) {
 
         long elapsed = now - state.getLastStatsTime();
-        //example: rateLimit is 5000 msg/s,
-        //10 ms have elapsed, we have published 200 messages
-        //the 200 msgs we have actually published should have taken us
-        //200 * 1000 / 5000 = 40 ms. So we pause for 40ms - 10ms
+        // example: rateLimit is 5000 msg/s,
+        // 10 ms have elapsed, we have published 200 messages
+        // the 200 msgs we have actually published should have taken us
+        // 200 * 1000 / 5000 = 40 ms. So we pause for 40ms - 10ms
         long pause = (long) (state.getRateLimit() == 0.0f ?
-            0.0f : (state.getMsgCount() * 1000.0 / state.getRateLimit() - elapsed));
+                0.0f : (state.getMsgCount() * 1000.0 / state.getRateLimit() - elapsed));
         if (pause > 0) {
             try {
                 Thread.sleep(pause);
@@ -56,10 +54,10 @@ public abstract class AgentBase {
     }
 
     protected void handleShutdownSignalExceptionOnWrite(Recovery.RecoveryProcess recoveryProcess, ShutdownSignalException e) {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(
-                "Handling write error, recovery process enabled? {}, condition to trigger connection recovery? {}",
-                recoveryProcess.isEnabled(), isConnectionRecoveryTriggered(e)
+        if (logger.isDebugEnabled()) {
+            logger.debug(
+                    "Handling write error, recovery process enabled? {}, condition to trigger connection recovery? {}",
+                    recoveryProcess.isEnabled(), isConnectionRecoveryTriggered(e)
             );
         }
         if (shouldStop(recoveryProcess, e)) {
@@ -83,9 +81,9 @@ public abstract class AgentBase {
             handleShutdownSignalExceptionOnWrite(recoveryProcess, e);
         } catch (SocketException e) {
             if (recoveryProcess.isEnabled()) {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug(
-                        "Socket exception in write, recovery process is enabled, ignoring to let connection recovery carry on"
+                if (logger.isDebugEnabled()) {
+                    logger.debug(
+                            "Socket exception in write, recovery process is enabled, ignoring to let connection recovery carry on"
                     );
                 }
             } else {

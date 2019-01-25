@@ -29,8 +29,7 @@ import com.rabbitmq.client.impl.NetworkConnection;
 public class Host {
 
     public static String capture(InputStream is)
-        throws IOException
-    {
+            throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(is));
         String line;
         StringBuilder buff = new StringBuilder();
@@ -40,8 +39,7 @@ public class Host {
         return buff.toString();
     }
 
-    public static Process executeCommand(String command) throws IOException
-    {
+    public static Process executeCommand(String command) throws IOException {
         Process pr = executeCommandProcess(command);
 
         int ev = waitForExitValue(pr);
@@ -49,15 +47,15 @@ public class Host {
             String stdout = capture(pr.getInputStream());
             String stderr = capture(pr.getErrorStream());
             throw new IOException("unexpected command exit value: " + ev +
-                                  "\ncommand: " + command + "\n" +
-                                  "\nstdout:\n" + stdout +
-                                  "\nstderr:\n" + stderr + "\n");
+                    "\ncommand: " + command + "\n" +
+                    "\nstdout:\n" + stdout +
+                    "\nstderr:\n" + stderr + "\n");
         }
         return pr;
     }
 
     private static int waitForExitValue(Process pr) {
-        while(true) {
+        while (true) {
             try {
                 pr.waitFor();
                 break;
@@ -68,15 +66,13 @@ public class Host {
         return pr.exitValue();
     }
 
-    public static Process executeCommandIgnoringErrors(String command) throws IOException
-    {
+    public static Process executeCommandIgnoringErrors(String command) throws IOException {
         Process pr = executeCommandProcess(command);
         waitForExitValue(pr);
         return pr;
     }
 
-    private static Process executeCommandProcess(String command) throws IOException
-    {
+    private static Process executeCommandProcess(String command) throws IOException {
         String[] finalCommand;
         if (System.getProperty("os.name").toLowerCase().contains("windows")) {
             finalCommand = new String[4];
@@ -95,69 +91,60 @@ public class Host {
 
     public static Process rabbitmqctl(String command) throws IOException {
         return executeCommand(rabbitmqctlCommand() +
-                              " -n \'" + nodenameA() + "\'" +
-                              " " + command);
+                " -n \'" + nodenameA() + "\'" +
+                " " + command);
     }
 
     public static Process rabbitmqctlIgnoreErrors(String command) throws IOException {
         return executeCommandIgnoringErrors(rabbitmqctlCommand() +
-                                            " -n \'" + nodenameA() + "\'" +
-                                            " " + command);
+                " -n \'" + nodenameA() + "\'" +
+                " " + command);
     }
 
     public static Process invokeMakeTarget(String command) throws IOException {
         File rabbitmqctl = new File(rabbitmqctlCommand());
         return executeCommand(makeCommand() +
-                              " -C \'" + rabbitmqDir() + "\'" +
-                              " RABBITMQCTL=\'" + rabbitmqctl.getAbsolutePath() + "\'" +
-                              " RABBITMQ_NODENAME=\'" + nodenameA() + "\'" +
-                              " RABBITMQ_NODE_PORT=" + node_portA() +
-                              " RABBITMQ_CONFIG_FILE=\'" + config_fileA() + "\'" +
-                              " " + command);
+                " -C \'" + rabbitmqDir() + "\'" +
+                " RABBITMQCTL=\'" + rabbitmqctl.getAbsolutePath() + "\'" +
+                " RABBITMQ_NODENAME=\'" + nodenameA() + "\'" +
+                " RABBITMQ_NODE_PORT=" + node_portA() +
+                " RABBITMQ_CONFIG_FILE=\'" + config_fileA() + "\'" +
+                " " + command);
     }
 
-    public static String makeCommand()
-    {
+    public static String makeCommand() {
         return System.getProperty("make.bin", "make");
     }
 
-    public static String nodenameA()
-    {
+    public static String nodenameA() {
         return System.getProperty("test-broker.A.nodename");
     }
 
-    public static String node_portA()
-    {
+    public static String node_portA() {
         return System.getProperty("test-broker.A.node_port");
     }
 
-    public static String config_fileA()
-    {
+    public static String config_fileA() {
         return System.getProperty("test-broker.A.config_file");
     }
 
-    public static String nodenameB()
-    {
+    public static String nodenameB() {
         return System.getProperty("test-broker.B.nodename");
     }
 
-    public static String node_portB()
-    {
+    public static String node_portB() {
         return System.getProperty("test-broker.B.node_port");
     }
 
-    public static String config_fileB()
-    {
+    public static String config_fileB() {
         return System.getProperty("test-broker.B.config_file");
     }
 
-    public static String rabbitmqctlCommand()
-    {
+    public static String rabbitmqctlCommand() {
         return System.getProperty("rabbitmqctl.bin");
     }
 
-    public static String rabbitmqDir()
-    {
+    public static String rabbitmqDir() {
         return System.getProperty("rabbitmq.dir");
     }
 
@@ -206,7 +193,7 @@ public class Host {
     private static Host.ConnectionInfo findConnectionInfoFor(List<Host.ConnectionInfo> xs, NetworkConnection c) {
         Host.ConnectionInfo result = null;
         for (Host.ConnectionInfo ci : xs) {
-            if(c.getLocalPort() == ci.getPeerPort()){
+            if (c.getLocalPort() == ci.getPeerPort()) {
                 result = ci;
                 break;
             }
