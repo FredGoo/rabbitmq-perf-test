@@ -30,7 +30,7 @@ public class Version {
 
     public static final String VERSION, BUILD, BUILD_TIMESTAMP;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Version.class);
+    private static final Logger logger = LoggerFactory.getLogger(Version.class);
 
     static {
         VERSION = getVersion();
@@ -43,11 +43,11 @@ public class Version {
         try {
             version = getValueFromPropertyFile("com.rabbitmq.perf.version");
         } catch (Exception e1) {
-            LOGGER.warn("Couldn't get version from property file", e1);
+            logger.warn("Couldn't get version from property file", e1);
             try {
                 version = getVersionFromPackage();
             } catch (Exception e2) {
-                LOGGER.warn("Couldn't get version with Package#getImplementationVersion", e1);
+                logger.warn("Couldn't get version with Package#getImplementationVersion", e1);
                 version = getDefaultVersion();
             }
         }
@@ -59,7 +59,7 @@ public class Version {
         try {
             build = getValueFromPropertyFile("com.rabbitmq.perf.build");
         } catch (Exception e) {
-            LOGGER.warn("Couldn't get build from property file", e);
+            logger.warn("Couldn't get build from property file", e);
             build = getDefaultBuild();
         }
         return build;
@@ -70,7 +70,7 @@ public class Version {
         try {
             build = getValueFromPropertyFile("com.rabbitmq.perf.build.timestamp");
         } catch (Exception e) {
-            LOGGER.warn("Couldn't get build timestamp from property file", e);
+            logger.warn("Couldn't get build timestamp from property file", e);
             build = getDefaultBuildTimestamp();
         }
         return build;

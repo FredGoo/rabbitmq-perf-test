@@ -45,12 +45,12 @@ public class DatadogMetrics implements Metrics {
         options.addOption(new Option("mda", "metrics-datadog", false, "enable Datadog metrics"));
         options.addOption(new Option("mdk", "metrics-datadog-api-key", true, "Datadog API key"));
         options.addOption(new Option("mds", "metrics-datadog-step-size", true, "step size (reporting frequency) to use "
-            + "in seconds, default is 10 seconds"));
+                + "in seconds, default is 10 seconds"));
         options.addOption(new Option("mdak", "metrics-datadog-application-key", true, "Datadog application key"));
         options.addOption(new Option("mdh", "metrics-datadog-host-tag", true, "tag that will be mapped to \"host\" when shipping metrics to datadog"));
         options.addOption(new Option("mdd", "metrics-datadog-descriptions", false, "if meter descriptions should be sent to Datadog"));
         options.addOption(new Option("mdu", "metrics-datadog-uri", true, "URI to ship metrics, useful when using "
-            + "a proxy, default is https://app.datadoghq.com"));
+                + "a proxy, default is https://app.datadoghq.com"));
         return options;
     }
 

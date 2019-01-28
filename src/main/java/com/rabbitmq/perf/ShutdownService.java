@@ -35,7 +35,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class ShutdownService implements AutoCloseable {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ShutdownService.class);
+    private static final Logger logger = LoggerFactory.getLogger(ShutdownService.class);
 
     private final List<AutoCloseable> closeables = Collections.synchronizedList(new ArrayList<>());
 
@@ -66,7 +66,7 @@ public class ShutdownService implements AutoCloseable {
                 try {
                     closeables.get(i).close();
                 } catch (Exception e) {
-                    LOGGER.warn("Could not properly closed {}", closeables.get(i), e);
+                    logger.warn("Could not properly closed {}", closeables.get(i), e);
                 }
             }
         }

@@ -26,7 +26,7 @@ public interface MessageBodySource {
     MessageEnvelope create(int sequenceNumber) throws IOException;
 
     class MessageEnvelope {
-        private final byte [] body;
+        private final byte[] body;
         private final String contentType;
         private final long time;
 

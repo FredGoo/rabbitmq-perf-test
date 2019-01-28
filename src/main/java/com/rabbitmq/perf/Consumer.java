@@ -36,21 +36,21 @@ import java.util.function.BiFunction;
 
 public class Consumer extends AgentBase implements Runnable {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Consumer.class);
+    private static final Logger logger = LoggerFactory.getLogger(Consumer.class);
 
-    private volatile ConsumerImpl       q;
-    private final Channel               channel;
-    private final String                id;
-    private final List<String>          queueNames;
-    private final int                   txSize;
-    private final boolean               autoAck;
-    private final int                   multiAckEvery;
-    private final Stats                 stats;
-    private final int                   msgLimit;
-    private final Map<String, String>   consumerTagBranchMap = Collections.synchronizedMap(new HashMap<String, String>());
-    private final ConsumerLatency       consumerLatency;
+    private volatile ConsumerImpl q;
+    private final Channel channel;
+    private final String id;
+    private final List<String> queueNames;
+    private final int txSize;
+    private final boolean autoAck;
+    private final int multiAckEvery;
+    private final Stats stats;
+    private final int msgLimit;
+    private final Map<String, String> consumerTagBranchMap = Collections.synchronizedMap(new HashMap<String, String>());
+    private final ConsumerLatency consumerLatency;
     private final BiFunction<BasicProperties, byte[], Long> timestampExtractor;
-    private final TimestampProvider     timestampProvider;
+    private final TimestampProvider timestampProvider;
     private final MulticastSet.CompletionHandler completionHandler;
     private final AtomicBoolean completed = new AtomicBoolean(false);
 
@@ -66,14 +66,14 @@ public class Consumer extends AgentBase implements Runnable {
                     MulticastSet.CompletionHandler completionHandler,
                     Recovery.RecoveryProcess recoveryProcess) {
 
-        this.channel           = channel;
-        this.id                = id;
-        this.queueNames        = queueNames;
-        this.txSize            = txSize;
-        this.autoAck           = autoAck;
-        this.multiAckEvery     = multiAckEvery;
-        this.stats             = stats;
-        this.msgLimit          = msgLimit;
+        this.channel = channel;
+        this.id = id;
+        this.queueNames = queueNames;
+        this.txSize = txSize;
+        this.autoAck = autoAck;
+        this.multiAckEvery = multiAckEvery;
+        this.stats = stats;
+        this.msgLimit = msgLimit;
         this.timestampProvider = timestampProvider;
         this.completionHandler = completionHandler;
 
@@ -87,8 +87,8 @@ public class Consumer extends AgentBase implements Runnable {
 
         if (timestampProvider.isTimestampInHeader()) {
             this.timestampExtractor = (properties, body) -> {
-                    Object timestamp = properties.getHeaders().get(Producer.TIMESTAMP_HEADER);
-                    return timestamp == null ? Long.MAX_VALUE : (Long) timestamp;
+                Object timestamp = properties.getHeaders().get(Producer.TIMESTAMP_HEADER);
+                return timestamp == null ? Long.MAX_VALUE : (Long) timestamp;
             };
         } else {
             this.timestampExtractor = (properties, body) -> {
@@ -174,12 +174,12 @@ public class Consumer extends AgentBase implements Runnable {
 
         @Override
         public void handleShutdownSignal(String consumerTag, ShutdownSignalException sig) {
-            LOGGER.debug(
-                "Consumer received shutdown signal, recovery process enabled? {}, condition to trigger connection recovery? {}",
-                recoveryProcess.isEnabled(), isConnectionRecoveryTriggered(sig)
+            logger.debug(
+                    "Consumer received shutdown signal, recovery process enabled? {}, condition to trigger connection recovery? {}",
+                    recoveryProcess.isEnabled(), isConnectionRecoveryTriggered(sig)
             );
             if (!recoveryProcess.isEnabled()) {
-                LOGGER.debug("Counting down for consumer");
+                logger.debug("Counting down for consumer");
                 countDown();
             }
         }
@@ -210,9 +210,9 @@ public class Consumer extends AgentBase implements Runnable {
             try {
                 channel.basicConsume(queue.name(), autoAck, entry.getKey(), q);
             } catch (IOException e) {
-                LOGGER.warn(
-                    "Error while recovering consumer {} on queue {} on connection {}",
-                    entry.getKey(), queue.name(), channel.getConnection().getClientProvidedName(), e
+                logger.warn(
+                        "Error while recovering consumer {} on queue {} on connection {}",
+                        entry.getKey(), queue.name(), channel.getConnection().getClientProvidedName(), e
                 );
             }
         }
@@ -221,7 +221,7 @@ public class Consumer extends AgentBase implements Runnable {
     private static class ConsumerState implements AgentState {
 
         private final float rateLimit;
-        private volatile long  lastStatsTime;
+        private volatile long lastStatsTime;
         private final AtomicInteger msgCount = new AtomicInteger(0);
 
         protected ConsumerState(float rateLimit) {
@@ -300,7 +300,7 @@ public class Consumer extends AgentBase implements Runnable {
         @Override
         public void simulateLatency() {
             long start = System.nanoTime();
-            while(System.nanoTime() - start < delay);
+            while (System.nanoTime() - start < delay) ;
         }
     }
 

@@ -31,9 +31,9 @@ public class ScenarioFactory {
         try {
             uri = read("uri", json, String.class, uri);
             factory.setUri(uri);
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException("scenario: " + name + " with malformed uri: "
-                                       + uri + " - " + e.getMessage());
+                    + uri + " - " + e.getMessage());
         }
 
         MulticastParams[] params = new MulticastParams[paramsJSON.size()];
@@ -43,11 +43,9 @@ public class ScenarioFactory {
 
         if (type.equals("simple")) {
             return new SimpleScenario(name, factory, interval, params);
-        }
-        else if (type.equals("rate-vs-latency")) {
+        } else if (type.equals("rate-vs-latency")) {
             return new RateVsLatencyScenario(name, factory, params[0]); // TODO
-        }
-        else if (type.equals("varying")) {
+        } else if (type.equals("varying")) {
             List variablesJSON = read("variables", json, List.class);
             Variable[] variables = new Variable[variablesJSON.size()];
             for (int i = 0; i < variablesJSON.size(); i++) {
@@ -60,20 +58,18 @@ public class ScenarioFactory {
         throw new RuntimeException("Type " + type + " was not simple or varying.");
     }
 
-    private static<T> T read(String key, Map map, Class<T> clazz) {
+    private static <T> T read(String key, Map map, Class<T> clazz) {
         if (map.containsKey(key)) {
             return read0(key, map, clazz);
-        }
-        else {
+        } else {
             throw new RuntimeException("Key " + key + " not found.");
         }
     }
 
-    private static<T> T read(String key, Map map, Class<T> clazz, T def) {
+    private static <T> T read(String key, Map map, Class<T> clazz, T def) {
         if (map.containsKey(key)) {
             return read0(key, map, clazz);
-        }
-        else {
+        } else {
             return def;
         }
     }
@@ -83,8 +79,7 @@ public class ScenarioFactory {
         Object o = map.get(key);
         if (clazz.isAssignableFrom(o.getClass())) {
             return (T) o;
-        }
-        else {
+        } else {
             throw new RuntimeException("Object under key " + key + " was a " + o.getClass() + ", not a " + clazz + ".");
         }
     }
@@ -93,7 +88,7 @@ public class ScenarioFactory {
         MulticastParams params = new MulticastParams();
         params.setAutoDelete(true);
         for (Object key : json.keySet()) {
-            PerfUtil.setValue(params, hyphensToCamel((String)key), json.get(key));
+            PerfUtil.setValue(params, hyphensToCamel((String) key), json.get(key));
         }
         return params;
     }

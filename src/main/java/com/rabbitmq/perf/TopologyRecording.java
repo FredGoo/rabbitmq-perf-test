@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
  */
 public class TopologyRecording {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TopologyRecording.class);
+    private static final Logger logger = LoggerFactory.getLogger(TopologyRecording.class);
 
     private final ConcurrentMap<String, RecordedExchange> exchanges = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, RecordedQueue> queues = new ConcurrentHashMap<>();
@@ -44,7 +44,7 @@ public class TopologyRecording {
             operation.write(channel);
             return channel;
         } catch (Exception e) {
-            LOGGER.warn("Error during topology recovery: {}", e.getMessage());
+            logger.warn("Error during topology recovery: {}", e.getMessage());
             return connection.createChannel();
         }
     }
@@ -95,34 +95,34 @@ public class TopologyRecording {
             for (Map.Entry<String, RecordedQueue> entry : queues.entrySet()) {
                 RecordedQueue queue = entry.getValue();
                 synchronized (queue) {
-                    LOGGER.debug("Connection {}, recovering {}", connection.getClientProvidedName(), queue);
+                    logger.debug("Connection {}, recovering {}", connection.getClientProvidedName(), queue);
                     channel = reliableWrite(connection, channel, ch -> {
                         String newName = ch.queueDeclare(
-                            queue.serverNamed ? "" : queue.name, queue.durable, queue.exclusive,
-                            queue.autoDelete, queue.arguments
+                                queue.serverNamed ? "" : queue.name, queue.durable, queue.exclusive,
+                                queue.autoDelete, queue.arguments
                         ).getQueue();
                         queue.name = newName;
                     });
-                    LOGGER.debug("Connection {}, recovered {}", connection.getClientProvidedName(), queue);
+                    logger.debug("Connection {}, recovered {}", connection.getClientProvidedName(), queue);
                 }
             }
             for (RecordedExchange exchange : exchanges.values()) {
-                LOGGER.debug("Connection {}, recovering {}", connection.getClientProvidedName(), exchange);
+                logger.debug("Connection {}, recovering {}", connection.getClientProvidedName(), exchange);
                 channel = reliableWrite(connection, channel, ch -> ch.exchangeDeclare(exchange.name, exchange.type));
-                LOGGER.debug("Connection {}, recovered {}", connection.getClientProvidedName(), exchange);
+                logger.debug("Connection {}, recovered {}", connection.getClientProvidedName(), exchange);
             }
             for (RecordedBinding binding : bindings) {
-                LOGGER.debug("Connection {}, recovering {}", connection.getClientProvidedName(), binding);
+                logger.debug("Connection {}, recovering {}", connection.getClientProvidedName(), binding);
                 RecordedQueue queue = queues.get(binding.queue);
                 synchronized (queue) {
                     channel = reliableWrite(connection, channel,
-                        ch -> ch.queueBind(queue.name, binding.exchange, binding.routingKeyIsQueue() ? queue.name : binding.routingKey));
+                            ch -> ch.queueBind(queue.name, binding.exchange, binding.routingKeyIsQueue() ? queue.name : binding.routingKey));
                 }
-                LOGGER.debug("Connection {}, recovered {}", connection.getClientProvidedName(), binding);
+                logger.debug("Connection {}, recovered {}", connection.getClientProvidedName(), binding);
             }
             channel.close();
         } catch (Exception e) {
-            LOGGER.warn("Error during topology recovery for connection {}: {}", connection.getClientProvidedName(), e.getMessage());
+            logger.warn("Error during topology recovery for connection {}: {}", connection.getClientProvidedName(), e.getMessage());
         }
     }
 
@@ -144,9 +144,9 @@ public class TopologyRecording {
         @Override
         public String toString() {
             return "RecordedExchange{" +
-                "name='" + name + '\'' +
-                ", type='" + type + '\'' +
-                '}';
+                    "name='" + name + '\'' +
+                    ", type='" + type + '\'' +
+                    '}';
         }
     }
 
@@ -175,13 +175,13 @@ public class TopologyRecording {
         @Override
         public String toString() {
             return "RecordedQueue{" +
-                "name='" + name + '\'' +
-                ", durable=" + durable +
-                ", exclusive=" + exclusive +
-                ", autoDelete=" + autoDelete +
-                ", arguments=" + arguments +
-                ", serverNamed=" + serverNamed +
-                '}';
+                    "name='" + name + '\'' +
+                    ", durable=" + durable +
+                    ", exclusive=" + exclusive +
+                    ", autoDelete=" + autoDelete +
+                    ", arguments=" + arguments +
+                    ", serverNamed=" + serverNamed +
+                    '}';
         }
     }
 
@@ -206,10 +206,10 @@ public class TopologyRecording {
         @Override
         public String toString() {
             return "RecordedBinding{" +
-                "queue='" + queue + '\'' +
-                ", exchange='" + exchange + '\'' +
-                ", routingKey='" + routingKey + '\'' +
-                '}';
+                    "queue='" + queue + '\'' +
+                    ", exchange='" + exchange + '\'' +
+                    ", routingKey='" + routingKey + '\'' +
+                    '}';
         }
     }
 }

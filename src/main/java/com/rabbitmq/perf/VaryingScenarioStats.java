@@ -24,7 +24,8 @@ public class VaryingScenarioStats implements ScenarioStats {
     private final Map<List<VariableValue>, SimpleScenarioStats> stats = new HashMap<List<VariableValue>, SimpleScenarioStats>();
     private final List<List<VariableValue>> keys = new ArrayList<List<VariableValue>>();
 
-    public VaryingScenarioStats() {}
+    public VaryingScenarioStats() {
+    }
 
     public SimpleScenarioStats next(List<VariableValue> value) {
         SimpleScenarioStats stats = new SimpleScenarioStats(1000L);
@@ -63,8 +64,7 @@ public class VaryingScenarioStats implements ScenarioStats {
                 VariableValue elem = key.get(i);
                 if (i == key.size() - 1) {
                     node.put(elem.getValue().toString(), results);
-                }
-                else {
+                } else {
                     node = (Map<String, Object>) get(elem.getValue().toString(), node, new HashMap<String, Object>());
                 }
             }

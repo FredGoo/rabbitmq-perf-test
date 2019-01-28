@@ -29,7 +29,7 @@ import static java.lang.String.valueOf;
  * It implements only the few methods used in {@link PerfTest}.
  * This class has been introduced to easily make environment
  * variables override or directly set arguments.
- *
+ * <p>
  * {@link CommandLine} doesn't implement any interface nor
  * can be subclassed, that's why this proxy trick is used.
  */
@@ -51,7 +51,7 @@ public class CommandLineProxy {
             return null;
         };
         this.argumentLookup = optionToLongOption
-            .andThen(longOption -> longOption == null ? null : argumentLookup.apply(longOption));
+                .andThen(longOption -> longOption == null ? null : argumentLookup.apply(longOption));
     }
 
     public boolean hasOption(char opt) {

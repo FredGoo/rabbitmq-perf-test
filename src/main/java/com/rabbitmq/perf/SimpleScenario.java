@@ -43,7 +43,7 @@ public class SimpleScenario implements Scenario {
     }
 
     public void run()
-        throws IOException, InterruptedException, TimeoutException, NoSuchAlgorithmException, KeyManagementException, URISyntaxException, ExecutionException {
+            throws IOException, InterruptedException, TimeoutException, NoSuchAlgorithmException, KeyManagementException, URISyntaxException, ExecutionException {
         this.stats = new SimpleScenarioStats(interval);
         for (MulticastParams p : params) {
             MulticastSet set = new MulticastSet(stats, factory, p, null, PerfTest.getCompletionHandler(p));

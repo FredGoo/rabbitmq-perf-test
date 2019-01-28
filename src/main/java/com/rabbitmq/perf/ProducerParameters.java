@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
  * @since 2.1.0
  */
 public class ProducerParameters {

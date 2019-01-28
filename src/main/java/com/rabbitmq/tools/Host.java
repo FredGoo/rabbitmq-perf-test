@@ -16,15 +16,11 @@
 
 package com.rabbitmq.tools;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import com.rabbitmq.client.impl.NetworkConnection;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.rabbitmq.client.impl.NetworkConnection;
 
 public class Host {
 

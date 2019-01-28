@@ -21,6 +21,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * A {@link ThreadFactory} that names threads with a prefix and a sequence number.
+ *
  * @since 2.1.0
  */
 public class NamedThreadFactory implements ThreadFactory {

@@ -31,7 +31,7 @@ import static com.rabbitmq.perf.OptionsUtils.forEach;
  */
 public class CompositeMetrics implements Metrics {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CompositeMetrics.class);
+    private static final Logger logger = LoggerFactory.getLogger(CompositeMetrics.class);
 
     private final List<Metrics> metrics = new ArrayList<>();
 
@@ -80,7 +80,7 @@ public class CompositeMetrics implements Metrics {
             try {
                 metric.close();
             } catch (Exception e) {
-                LOGGER.warn("Error while closing metrics {}", metrics, e);
+                logger.warn("Error while closing metrics {}", metrics, e);
             }
         }
     }

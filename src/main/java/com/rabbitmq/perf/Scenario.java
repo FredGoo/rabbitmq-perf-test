@@ -17,6 +17,8 @@ package com.rabbitmq.perf;
 
 public interface Scenario {
     public String getName();
+
     public void run() throws Exception;
+
     public ScenarioStats getStats();
 }

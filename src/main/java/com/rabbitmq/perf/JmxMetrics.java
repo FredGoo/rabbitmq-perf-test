@@ -40,15 +40,15 @@ public class JmxMetrics implements Metrics {
     public void configure(CommandLineProxy cmd, CompositeMeterRegistry meterRegistry, ConnectionFactory factory) throws Exception {
         if (isEnabled(cmd)) {
             registry = new JmxMeterRegistry(
-                JmxConfig.DEFAULT,
-                Clock.SYSTEM
+                    JmxConfig.DEFAULT,
+                    Clock.SYSTEM
             );
             meterRegistry.add(registry);
         }
     }
 
     public void close() {
-        if (registry!= null) {
+        if (registry != null) {
             registry.close();
         }
     }

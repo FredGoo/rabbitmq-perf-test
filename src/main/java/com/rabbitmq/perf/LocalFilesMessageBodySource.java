@@ -15,7 +15,10 @@
 
 package com.rabbitmq.perf;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +41,7 @@ public class LocalFilesMessageBodySource implements MessageBodySource {
                 throw new IllegalArgumentException(fileName + " isn't a valid body file.");
             }
             try (BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(file))) {
-                byte [] body = new byte[(int) file.length()];
+                byte[] body = new byte[(int) file.length()];
                 inputStream.read(body, 0, body.length);
                 bodies.add(body);
             }
@@ -53,7 +56,7 @@ public class LocalFilesMessageBodySource implements MessageBodySource {
     @Override
     public MessageEnvelope create(int sequenceNumber) {
         return new MessageEnvelope(
-            bodies.get(sequenceNumber % bodies.size()), contentType, ZERO
+                bodies.get(sequenceNumber % bodies.size()), contentType, ZERO
         );
     }
 }

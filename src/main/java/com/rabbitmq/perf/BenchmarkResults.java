@@ -38,13 +38,13 @@ import java.net.URI;
 public class BenchmarkResults {
 
     public static void main(String[] args) throws Exception {
-        if(args.length != 1) {
+        if (args.length != 1) {
             System.out.println("Usage: BenchmarkResults result-json-file");
             System.exit(1);
         }
         StringBuilder builder = new StringBuilder();
         File resultsFile = new File(args[0]);
-        try (BufferedReader reader = new BufferedReader(new FileReader(resultsFile))){
+        try (BufferedReader reader = new BufferedReader(new FileReader(resultsFile))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 builder.append(line);
@@ -75,7 +75,7 @@ public class BenchmarkResults {
 
     public static class JsonServlet extends HttpServlet {
 
-        private static final Logger LOGGER = LoggerFactory.getLogger(JsonServlet.class);
+        private static final Logger logger = LoggerFactory.getLogger(JsonServlet.class);
 
         private final String content;
 
@@ -89,7 +89,7 @@ public class BenchmarkResults {
                 resp.getWriter().append(content);
                 resp.getWriter().flush();
             } catch (IOException e) {
-                LOGGER.warn("Error during content writing", e);
+                logger.warn("Error during content writing", e);
             }
         }
     }

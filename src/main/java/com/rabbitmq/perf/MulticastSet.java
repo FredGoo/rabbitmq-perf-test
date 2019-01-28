@@ -42,7 +42,7 @@ public class MulticastSet {
 
     // from Java Client ConsumerWorkService
     public final static int DEFAULT_CONSUMER_WORK_SERVICE_THREAD_POOL_SIZE = Runtime.getRuntime().availableProcessors() * 2;
-    private static final Logger LOGGER = LoggerFactory.getLogger(MulticastSet.class);
+    private static final Logger logger = LoggerFactory.getLogger(MulticastSet.class);
     /**
      * Why 50? This is arbitrary. The fastest rate is 1 message / second when
      * using a publishing interval, so 1 thread should be able to keep up easily with
@@ -63,7 +63,7 @@ public class MulticastSet {
     private ThreadingHandler threadingHandler = new DefaultThreadingHandler();
 
     public MulticastSet(Stats stats, ConnectionFactory factory,
-        MulticastParams params, List<String> uris, CompletionHandler completionHandler) {
+                        MulticastParams params, List<String> uris, CompletionHandler completionHandler) {
         this(stats, factory, params, "perftest", uris, completionHandler, new ShutdownService());
     }
 
@@ -71,8 +71,9 @@ public class MulticastSet {
                         MulticastParams params, String testID, List<String> uris, CompletionHandler completionHandler) {
         this(stats, factory, params, testID, uris, completionHandler, new ShutdownService());
     }
+
     public MulticastSet(Stats stats, ConnectionFactory factory,
-        MulticastParams params, String testID, List<String> uris, CompletionHandler completionHandler, ShutdownService shutdownService) {
+                        MulticastParams params, String testID, List<String> uris, CompletionHandler completionHandler, ShutdownService shutdownService) {
         this.stats = stats;
         this.factory = factory;
         this.params = params;
@@ -100,15 +101,15 @@ public class MulticastSet {
     }
 
     public void run()
-        throws IOException, InterruptedException, TimeoutException, NoSuchAlgorithmException, KeyManagementException, URISyntaxException, ExecutionException {
+            throws IOException, InterruptedException, TimeoutException, NoSuchAlgorithmException, KeyManagementException, URISyntaxException, ExecutionException {
         run(false);
     }
 
     public void run(boolean announceStartup)
-        throws IOException, InterruptedException, TimeoutException, NoSuchAlgorithmException, KeyManagementException, URISyntaxException, ExecutionException {
+            throws IOException, InterruptedException, TimeoutException, NoSuchAlgorithmException, KeyManagementException, URISyntaxException, ExecutionException {
         ScheduledExecutorService heartbeatSenderExecutorService = this.threadingHandler.scheduledExecutorService(
-            "perf-test-heartbeat-sender-",
-            this.params.getHeartbeatSenderThreads()
+                "perf-test-heartbeat-sender-",
+                this.params.getHeartbeatSenderThreads()
         );
         factory.setHeartbeatExecutor(heartbeatSenderExecutorService);
         setUri();
@@ -132,7 +133,7 @@ public class MulticastSet {
         // producers don't need an executor service, as they don't have any consumers
         // this consumer should never be asked to create any threads
         ExecutorService executorServiceForProducersConsumers = this.threadingHandler.executorService(
-            "perf-test-producers-worker-", 0
+                "perf-test-producers-worker-", 0
         );
         factory.setSharedExecutor(executorServiceForProducersConsumers);
         createProducers(announceStartup, producerStates, producerConnections);
@@ -157,14 +158,15 @@ public class MulticastSet {
                         shutdownThread.start();
                         boolean done = latch.await(shutdownTimeout, TimeUnit.SECONDS);
                         if (!done) {
-                            LOGGER.debug("Shutdown not completed in {} second(s), aborting.", shutdownTimeout);
+                            logger.debug("Shutdown not completed in {} second(s), aborting.", shutdownTimeout);
                             shutdownThread.interrupt();
                         }
                     }
             );
         } else {
             // no closing timeout, we don't do anything
-            shutdownSequence = () -> { };
+            shutdownSequence = () -> {
+            };
         }
 
         this.completionHandler.waitForCompletion();
@@ -180,11 +182,11 @@ public class MulticastSet {
         Function<Integer, ExecutorService> consumersExecutorsFactory;
         if (params.getConsumersThreadPools() > 0) {
             consumersExecutorsFactory = new CacheConsumersExecutorsFactory(
-                this.threadingHandler, this.params, params.getConsumersThreadPools()
+                    this.threadingHandler, this.params, params.getConsumersThreadPools()
             );
         } else {
             consumersExecutorsFactory = new NoCacheConsumersExecutorsFactory(
-                this.threadingHandler, this.params
+                    this.threadingHandler, this.params
             );
         }
         return consumersExecutorsFactory;
@@ -272,13 +274,13 @@ public class MulticastSet {
 
     private void shutdown(Connection configurationConnection, Connection[] consumerConnections, AgentState[] producerStates, Connection[] producerConnections) {
         try {
-            LOGGER.debug("Starting test shutdown");
+            logger.debug("Starting test shutdown");
             for (AgentState producerState : producerStates) {
                 if (Thread.interrupted()) {
                     return;
                 }
                 boolean cancelled = producerState.task.cancel(true);
-                LOGGER.debug("Producer has been correctly cancelled: {}", cancelled);
+                logger.debug("Producer has been correctly cancelled: {}", cancelled);
             }
 
             // we do our best to stop producers before closing their connections
@@ -290,7 +292,7 @@ public class MulticastSet {
                         }
                         producerState.task.get(10, TimeUnit.SECONDS);
                     } catch (Exception e) {
-                        LOGGER.debug("Error while waiting for producer to stop: {}. Moving on.", e.getMessage());
+                        logger.debug("Error while waiting for producer to stop: {}. Moving on.", e.getMessage());
                     }
                 }
             }
@@ -317,16 +319,16 @@ public class MulticastSet {
             if (Thread.interrupted()) {
                 return;
             }
-            LOGGER.debug("Shutting down threading handler");
+            logger.debug("Shutting down threading handler");
             this.threadingHandler.shutdown();
-            LOGGER.debug("Threading handler shut down");
+            logger.debug("Threading handler shut down");
         } catch (Exception e) {
-            LOGGER.warn("Error during test shutdown", e);
+            logger.warn("Error during test shutdown", e);
         }
     }
 
     private void enableTopologyRecoveryIfNecessary(Connection configurationConnection, MulticastParams.TopologyHandlerResult topologyHandlerResult)
-        throws IOException {
+            throws IOException {
         if (isRecoverable(topologyHandlerResult.connection)) {
             Connection connection = topologyHandlerResult.connection;
             String connectionName = connection.getClientProvidedName();
@@ -334,14 +336,14 @@ public class MulticastSet {
 
                 @Override
                 public void handleRecoveryStarted(Recoverable recoverable) {
-                    LOGGER.debug("Connection recovery started for connection {}", connectionName);
+                    logger.debug("Connection recovery started for connection {}", connectionName);
                 }
 
                 @Override
                 public void handleRecovery(Recoverable recoverable) {
-                    LOGGER.debug("Starting topology recovery for connection {}", connectionName);
+                    logger.debug("Starting topology recovery for connection {}", connectionName);
                     topologyHandlerResult.topologyRecording.recover(connection);
-                    LOGGER.debug("Topology recovery done for connection {}", connectionName);
+                    logger.debug("Topology recovery done for connection {}", connectionName);
                 }
             });
         } else {
@@ -351,16 +353,16 @@ public class MulticastSet {
 
     private static void dispose(Connection connection) {
         try {
-            LOGGER.debug("Closing connection {}", connection.getClientProvidedName());
+            logger.debug("Closing connection {}", connection.getClientProvidedName());
             // we need to shutdown, it should not take forever, so we pick a reasonably
             // small timeout (3 seconds)
             connection.close(AMQP.REPLY_SUCCESS, "Closed by PerfTest", 3000);
-            LOGGER.debug("Connection {} has been closed", connection.getClientProvidedName());
+            logger.debug("Connection {} has been closed", connection.getClientProvidedName());
         } catch (AlreadyClosedException e) {
-            LOGGER.debug("Connection {} already closed", connection.getClientProvidedName());
+            logger.debug("Connection {} already closed", connection.getClientProvidedName());
         } catch (Exception e) {
             // just log, we don't want to stop here
-            LOGGER.debug("Error while closing connection {}: {}", connection.getClientProvidedName(), e.getMessage());
+            logger.debug("Error while closing connection {}: {}", connection.getClientProvidedName(), e.getMessage());
         }
     }
 
@@ -442,7 +444,7 @@ public class MulticastSet {
                         boolean terminated = executorService.awaitTermination(10, TimeUnit.SECONDS);
                         if (!terminated) {
                             LoggerFactory.getLogger(DefaultThreadingHandler.class).warn(
-                                "Some producer and/or consumer tasks didn't finish"
+                                    "Some producer and/or consumer tasks didn't finish"
                             );
                         }
                     } catch (InterruptedException e) {
@@ -477,16 +479,16 @@ public class MulticastSet {
                 this.latch.await();
             } else {
                 boolean countedDown = this.latch.await(timeLimit, TimeUnit.SECONDS);
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Completed, counted down? {}", countedDown);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Completed, counted down? {}", countedDown);
                 }
             }
         }
 
         @Override
         public void countDown() {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Counting down");
+            if (logger.isDebugEnabled()) {
+                logger.debug("Counting down");
             }
             latch.countDown();
         }
@@ -525,8 +527,8 @@ public class MulticastSet {
         @Override
         public ExecutorService apply(Integer consumerNumber) {
             ExecutorService executorService = this.threadingHandler.executorService(
-                format("perf-test-consumer-%d-worker-", consumerNumber),
-                nbThreadsForConsumer(this.params)
+                    format("perf-test-consumer-%d-worker-", consumerNumber),
+                    nbThreadsForConsumer(this.params)
             );
             return executorService;
         }
@@ -553,8 +555,8 @@ public class MulticastSet {
             ExecutorService executorService = cache.get(remaining);
             if (executorService == null) {
                 executorService = this.threadingHandler.executorService(
-                    format("perf-test-shared-consumer-worker-%d-", remaining),
-                    nbThreadsForConsumer(this.params)
+                        format("perf-test-shared-consumer-worker-%d-", remaining),
+                        nbThreadsForConsumer(this.params)
                 );
                 cache.set(remaining, executorService);
             }

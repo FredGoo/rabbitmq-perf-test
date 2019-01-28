@@ -53,8 +53,7 @@ public class VaryingScenario implements Scenario {
                 values2.add(value);
                 run(rest, values2);
             }
-        }
-        else {
+        } else {
             SimpleScenarioStats stats0 = stats.next(values);
             for (MulticastParams p : params) {
                 for (VariableValue value : values) {

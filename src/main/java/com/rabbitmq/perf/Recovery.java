@@ -46,7 +46,7 @@ public class Recovery {
             return false;
         }
     };
-    private static final Logger LOGGER = LoggerFactory.getLogger(Recovery.class);
+    private static final Logger logger = LoggerFactory.getLogger(Recovery.class);
 
     static Recovery.RecoveryProcess setupRecoveryProcess(Connection connection, TopologyRecording topologyRecording) {
         if (Utils.isRecoverable(connection)) {
@@ -79,17 +79,17 @@ public class Recovery {
 
                 @Override
                 public void handleRecovery(Recoverable recoverable) {
-                    LOGGER.debug("Starting topology recovery for connection {}", connection.getClientProvidedName());
+                    logger.debug("Starting topology recovery for connection {}", connection.getClientProvidedName());
                     topologyRecording.recover(connection);
-                    LOGGER.debug("Topology recovery done for connection {}, starting agent recovery", connection.getClientProvidedName());
+                    logger.debug("Topology recovery done for connection {}, starting agent recovery", connection.getClientProvidedName());
                     agentReference.get().recover(topologyRecording);
                     recoveryInProgress.set(false);
-                    LOGGER.debug("Connection recovery done for connection {}", connection.getClientProvidedName());
+                    logger.debug("Connection recovery done for connection {}", connection.getClientProvidedName());
                 }
             });
             connection.addShutdownListener(cause -> {
                 if (AutorecoveringConnection.DEFAULT_CONNECTION_RECOVERY_TRIGGERING_CONDITION.test(cause)) {
-                    LOGGER.debug("Setting recovery in progress flag for connection {}", connection.getClientProvidedName());
+                    logger.debug("Setting recovery in progress flag for connection {}", connection.getClientProvidedName());
                     recoveryInProgress.set(true);
                 }
             });

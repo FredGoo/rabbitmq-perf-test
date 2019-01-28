@@ -35,7 +35,7 @@ import java.io.IOException;
  */
 public class RelaxedExceptionHandler extends DefaultExceptionHandler {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RelaxedExceptionHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(RelaxedExceptionHandler.class);
 
     private static boolean isSocketClosedOrConnectionReset(Throwable e) {
         return e instanceof IOException &&
@@ -48,9 +48,9 @@ public class RelaxedExceptionHandler extends DefaultExceptionHandler {
     protected void log(String message, Throwable e) {
         if (isSocketClosedOrConnectionReset(e)) {
             // we don't want to get too dramatic about those
-            LOGGER.info("{} (Exception message: {})", message, e.getMessage());
+            logger.info("{} (Exception message: {})", message, e.getMessage());
         } else {
-            LOGGER.error(message, e);
+            logger.error(message, e);
         }
     }
 }

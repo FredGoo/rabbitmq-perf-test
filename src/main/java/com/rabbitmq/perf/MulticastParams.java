@@ -21,11 +21,7 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ShutdownSignalException;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeoutException;
@@ -103,7 +99,7 @@ public class MulticastParams {
     }
 
     public void setQueueNames(List<String> queueNames) {
-        if(queueNames == null) {
+        if (queueNames == null) {
             this.queueNames = new ArrayList<>();
         } else {
             this.queueNames = new ArrayList<>(queueNames);
@@ -117,9 +113,9 @@ public class MulticastParams {
     public void setRandomRoutingKey(boolean randomRoutingKey) {
         this.randomRoutingKey = randomRoutingKey;
     }
-    
+
     public void setSkipBindingQueues(boolean skipBindingQueues) {
-    	this.skipBindingQueues = skipBindingQueues;
+        this.skipBindingQueues = skipBindingQueues;
     }
 
     public void setProducerRateLimit(float producerRateLimit) {
@@ -145,7 +141,7 @@ public class MulticastParams {
     public void setConsumerChannelCount(int consumerChannelCount) {
         this.consumerChannelCount = consumerChannelCount;
     }
-    
+
     public void setConsumerSlowStart(boolean slowStart) {
         this.consumerSlowStart = slowStart;
     }
@@ -246,7 +242,7 @@ public class MulticastParams {
     public int getConsumerChannelCount() {
         return consumerChannelCount;
     }
-    
+
     public boolean getConsumerSlowStart() {
         return consumerSlowStart;
     }
@@ -354,14 +350,14 @@ public class MulticastParams {
         Recovery.RecoveryProcess recoveryProcess = setupRecoveryProcess(connection, topologyRecording);
 
         final Producer producer = new Producer(new ProducerParameters()
-            .setChannel(channel).setExchangeName(exchangeName).setId(this.topologyHandler.getRoutingKey())
-            .setRandomRoutingKey(randomRoutingKey).setFlags(flags).setTxSize(producerTxSize)
-            .setRateLimit(calculatedProducerRateLimit).setMsgLimit(producerMsgCount).setConfirm(confirm)
-            .setConfirmTimeout(confirmTimeout).setMessageBodySource(messageBodySource).setTsp(tsp)
-            .setStats(stats).setMessageProperties(messageProperties).setCompletionHandler(completionHandler)
-            .setRoutingKeyCacheSize(this.routingKeyCacheSize)
-            .setRandomStartDelayInSeconds(this.producerRandomStartDelayInSeconds)
-            .setRecoveryProcess(recoveryProcess)
+                .setChannel(channel).setExchangeName(exchangeName).setId(this.topologyHandler.getRoutingKey())
+                .setRandomRoutingKey(randomRoutingKey).setFlags(flags).setTxSize(producerTxSize)
+                .setRateLimit(calculatedProducerRateLimit).setMsgLimit(producerMsgCount).setConfirm(confirm)
+                .setConfirmTimeout(confirmTimeout).setMessageBodySource(messageBodySource).setTsp(tsp)
+                .setStats(stats).setMessageProperties(messageProperties).setCompletionHandler(completionHandler)
+                .setRoutingKeyCacheSize(this.routingKeyCacheSize)
+                .setRandomStartDelayInSeconds(this.producerRandomStartDelayInSeconds)
+                .setRecoveryProcess(recoveryProcess)
         );
         channel.addReturnListener(producer);
         channel.addConfirmListener(producer);
@@ -388,9 +384,9 @@ public class MulticastParams {
         Recovery.RecoveryProcess recoveryProcess = setupRecoveryProcess(connection, topologyHandlerResult.topologyRecording);
 
         Consumer consumer = new Consumer(channel, this.topologyHandler.getRoutingKey(), topologyHandlerResult.configuredQueues,
-                                         consumerTxSize, autoAck, multiAckEvery,
-                                         stats, consumerRateLimit, consumerMsgCount,
-                                         consumerLatencyInMicroseconds, tsp, completionHandler, recoveryProcess);
+                consumerTxSize, autoAck, multiAckEvery,
+                stats, consumerRateLimit, consumerMsgCount,
+                consumerLatencyInMicroseconds, tsp, completionHandler, recoveryProcess);
         this.topologyHandler.next();
         return consumer;
     }
@@ -471,8 +467,7 @@ public class MulticastParams {
             checker.check(ch);
             ch.abort();
             return true;
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             ShutdownSignalException sse = (ShutdownSignalException) e.getCause();
             if (!sse.isHardError()) {
                 AMQP.Channel.Close closeMethod = (AMQP.Channel.Close) sse.getReason();
@@ -492,12 +487,14 @@ public class MulticastParams {
 
         /**
          * Get the current routing key
+         *
          * @return
          */
         String getRoutingKey();
 
         /**
          * Configure the queues for the current client (e.g. consumer or producer)
+         *
          * @param connection
          * @return the configured queues names (can be server-generated names), connection, and topology recording
          * @throws IOException
@@ -506,6 +503,7 @@ public class MulticastParams {
 
         /**
          * Configure all the queues for this run
+         *
          * @param connection
          * @return the configured queues names (can be server-generated names), connection, and topology recording
          * @throws IOException
@@ -660,11 +658,13 @@ public class MulticastParams {
             if (this.params.isExclusive()) {
                 Connection connectionToUse = maybeUseCachedConnection(this.queueNames, connection);
                 return new TopologyHandlerResult(
-                    connectionToUse, configureQueues(connectionToUse, this.queueNames, topologyRecording, () -> {}), topologyRecording
+                        connectionToUse, configureQueues(connectionToUse, this.queueNames, topologyRecording, () -> {
+                }), topologyRecording
                 );
             } else {
                 return new TopologyHandlerResult(
-                    connection, configureQueues(connection, this.queueNames, topologyRecording, () -> {}), topologyRecording
+                        connection, configureQueues(connection, this.queueNames, topologyRecording, () -> {
+                }), topologyRecording
                 );
             }
         }
@@ -672,7 +672,8 @@ public class MulticastParams {
         @Override
         public TopologyHandlerResult configureAllQueues(Connection connection) throws IOException {
             if (shouldConfigureQueues() && !this.params.isExclusive()) {
-                return new TopologyHandlerResult(connection, configureQueues(connection, this.queueNames, topologyRecording, () -> {}), topologyRecording);
+                return new TopologyHandlerResult(connection, configureQueues(connection, this.queueNames, topologyRecording, () -> {
+                }), topologyRecording);
             }
             return new TopologyHandlerResult(connection, new ArrayList<>(), new TopologyRecording());
         }
@@ -724,17 +725,18 @@ public class MulticastParams {
                 Connection connectionToUse = maybeUseCachedConnection(getQueueNamesForClient(), connection);
                 TopologyRecording clientTopologyRecording = new TopologyRecording();
                 return new TopologyHandlerResult(
-                    connectionToUse,
-                    configureQueues(connectionToUse, getQueueNamesForClient(), clientTopologyRecording, () -> {}),
-                    clientTopologyRecording
+                        connectionToUse,
+                        configureQueues(connectionToUse, getQueueNamesForClient(), clientTopologyRecording, () -> {
+                        }),
+                        clientTopologyRecording
                 );
             } else {
                 List<String> queues = getQueueNamesForClient();
                 TopologyRecording clientTopologyRecording = this.topologyRecording.subRecording(queues);
                 return new TopologyHandlerResult(
-                    connection,
-                    getQueueNamesForClient(),
-                    clientTopologyRecording
+                        connection,
+                        getQueueNamesForClient(),
+                        clientTopologyRecording
                 );
             }
 

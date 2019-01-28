@@ -24,14 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.Semaphore;
@@ -44,10 +37,9 @@ import java.util.function.Supplier;
 import static java.util.stream.Collectors.toMap;
 
 public class Producer extends AgentBase implements Runnable, ReturnListener,
-        ConfirmListener
-{
+        ConfirmListener {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Producer.class);
+    private static final Logger logger = LoggerFactory.getLogger(Producer.class);
 
     public static final String TIMESTAMP_PROPERTY = "timestamp";
     public static final String CONTENT_TYPE_PROPERTY = "contentType";
@@ -64,14 +56,14 @@ public class Producer extends AgentBase implements Runnable, ReturnListener,
     public static final String CLUSTER_ID_PROPERTY = "clusterId";
     public static final String TIMESTAMP_HEADER = TIMESTAMP_PROPERTY;
     private final Channel channel;
-    private final String  exchangeName;
-    private final String  id;
+    private final String exchangeName;
+    private final String id;
     private final boolean mandatory;
     private final boolean persistent;
-    private final int     txSize;
-    private final int     msgLimit;
+    private final int txSize;
+    private final int msgLimit;
 
-    private final Stats   stats;
+    private final Stats stats;
 
     private final MessageBodySource messageBodySource;
 
@@ -96,15 +88,15 @@ public class Producer extends AgentBase implements Runnable, ReturnListener,
     private final TimestampProvider timestampProvider;
 
     public Producer(ProducerParameters parameters) {
-        this.channel           = parameters.getChannel();
-        this.exchangeName      = parameters.getExchangeName();
-        this.id                = parameters.getId();
-        this.mandatory         = parameters.getFlags().contains("mandatory");
-        this.persistent        = parameters.getFlags().contains("persistent");
+        this.channel = parameters.getChannel();
+        this.exchangeName = parameters.getExchangeName();
+        this.id = parameters.getId();
+        this.mandatory = parameters.getFlags().contains("mandatory");
+        this.persistent = parameters.getFlags().contains("persistent");
 
         Function<AMQP.BasicProperties.Builder, AMQP.BasicProperties.Builder> builderProcessor = Function.identity();
-        this.txSize            = parameters.getTxSize();
-        this.msgLimit          = parameters.getMsgLimit();
+        this.txSize = parameters.getTxSize();
+        this.msgLimit = parameters.getMsgLimit();
         this.messageBodySource = parameters.getMessageBodySource();
         this.timestampProvider = parameters.getTsp();
         if (this.timestampProvider.isTimestampInHeader()) {
@@ -117,7 +109,7 @@ public class Producer extends AgentBase implements Runnable, ReturnListener,
         this.shouldTrackPublishConfirms = shouldTrackPublishConfirm(parameters);
 
         if (parameters.getConfirm() > 0) {
-            this.confirmPool  = new Semaphore((int)parameters.getConfirm());
+            this.confirmPool = new Semaphore((int) parameters.getConfirm());
             this.confirmTimeout = parameters.getConfirmTimeout();
         }
         this.stats = parameters.getStats();
@@ -198,8 +190,8 @@ public class Producer extends AgentBase implements Runnable, ReturnListener,
         }
 
         final Map<String, Object> headers = messageProperties.entrySet().stream()
-            .filter(entry -> !isPropertyKey(entry.getKey()))
-            .collect(toMap(e -> e.getKey(), e -> e.getValue()));
+                .filter(entry -> !isPropertyKey(entry.getKey()))
+                .collect(toMap(e -> e.getKey(), e -> e.getValue()));
 
         if (!headers.isEmpty()) {
             builderProcessor = builderProcessor.andThen(builder -> {
@@ -295,7 +287,7 @@ public class Producer extends AgentBase implements Runnable, ReturnListener,
         } else {
             Long messageTimestamp = unconfirmed.remove(seqNo);
             if (messageTimestamp != null) {
-                latencies = new long[] {this.timestampProvider.getDifference(currentTime, messageTimestamp)};
+                latencies = new long[]{this.timestampProvider.getDifference(currentTime, messageTimestamp)};
             } else {
                 latencies = new long[0];
             }
@@ -342,7 +334,7 @@ public class Producer extends AgentBase implements Runnable, ReturnListener,
                 now = System.currentTimeMillis();
             }
         } catch (RuntimeException e) {
-            LOGGER.debug("Error in publisher", e);
+            logger.debug("Error in publisher", e);
             // failing, we don't want to block the whole process, so counting down
             countDown();
             throw e;
@@ -361,10 +353,12 @@ public class Producer extends AgentBase implements Runnable, ReturnListener,
         // make the producer state thread-safe for what we use in this case
         final ProducerState state = new ProducerState(this.rateLimit) {
             final AtomicInteger messageCount = new AtomicInteger(0);
+
             @Override
             protected void setMsgCount(int msgCount) {
                 messageCount.set(msgCount);
             }
+
             @Override
             public int getMsgCount() {
                 return messageCount.get();
@@ -413,14 +407,14 @@ public class Producer extends AgentBase implements Runnable, ReturnListener,
                 throw new RuntimeException(e);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-                throw new RuntimeException (e);
+                throw new RuntimeException(e);
             }
         } else {
             // The connection is recovering, waiting a bit.
             // The duration is arbitrary: don't want to empty loop
             // too much and don't want to catch too late with recovery
             try {
-                LOGGER.debug("Recovery in progress, sleeping for a sec");
+                logger.debug("Recovery in progress, sleeping for a sec");
                 Thread.sleep(1000L);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
@@ -449,7 +443,7 @@ public class Producer extends AgentBase implements Runnable, ReturnListener,
     }
 
     private void publish(MessageBodySource.MessageEnvelope messageEnvelope)
-        throws IOException {
+            throws IOException {
 
         AMQP.BasicProperties.Builder propertiesBuilder = new AMQP.BasicProperties.Builder();
         if (persistent) {
@@ -473,9 +467,9 @@ public class Producer extends AgentBase implements Runnable, ReturnListener,
             }
         }
         channel.basicPublish(exchangeName, routingKeyGenerator.get(),
-                             mandatory, false,
-                             messageProperties,
-                             messageEnvelope.getBody());
+                mandatory, false,
+                messageProperties,
+                messageEnvelope.getBody());
     }
 
     private void countDown() {
@@ -495,7 +489,7 @@ public class Producer extends AgentBase implements Runnable, ReturnListener,
     private static class ProducerState implements AgentState {
 
         private final float rateLimit;
-        private long  lastStatsTime;
+        private long lastStatsTime;
         private int msgCount = 0;
 
         protected ProducerState(float rateLimit) {
@@ -530,7 +524,7 @@ public class Producer extends AgentBase implements Runnable, ReturnListener,
 
     static class CachingRoutingKeyGenerator implements Supplier<String> {
 
-        private final String [] keys;
+        private final String[] keys;
         private int count = 0;
 
         public CachingRoutingKeyGenerator(int cacheSize) {

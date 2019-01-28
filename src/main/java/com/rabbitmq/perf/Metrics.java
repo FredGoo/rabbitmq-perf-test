@@ -27,7 +27,8 @@ public interface Metrics {
 
     Options options();
 
-    default void configure(CommandLineProxy cmd, CompositeMeterRegistry meterRegistry, ConnectionFactory factory) throws Exception { }
+    default void configure(CommandLineProxy cmd, CompositeMeterRegistry meterRegistry, ConnectionFactory factory) throws Exception {
+    }
 
     default boolean isEnabled(CommandLineProxy cmd) {
         for (Object optObj : this.options().getOptions()) {
@@ -39,6 +40,7 @@ public interface Metrics {
         return false;
     }
 
-    default void close() throws Exception { }
+    default void close() throws Exception {
+    }
 
 }

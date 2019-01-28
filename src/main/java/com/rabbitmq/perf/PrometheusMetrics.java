@@ -67,7 +67,7 @@ public class PrometheusMetrics implements Metrics {
             server = new Server(threadPool);
             ServerConnector connector = new ServerConnector(server); //NOSONAR
             connector.setPort(prometheusHttpEndpointPort);
-            server.setConnectors(new Connector[] { connector });
+            server.setConnectors(new Connector[]{connector});
 
             ContextHandler context = new ContextHandler();
             context.setContextPath(prometheusHttpEndpoint);
@@ -75,7 +75,7 @@ public class PrometheusMetrics implements Metrics {
 
                 @Override
                 public void handle(String s, Request request, HttpServletRequest httpServletRequest, HttpServletResponse response)
-                    throws IOException {
+                        throws IOException {
                     String scraped = registry.scrape();
 
                     response.setStatus(HttpServletResponse.SC_OK);

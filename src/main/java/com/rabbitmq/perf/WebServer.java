@@ -24,14 +24,14 @@ import org.eclipse.jetty.servlet.ServletHolder;
 public class WebServer {
 
     public static void main(String[] args) throws Exception {
-        if(args.length != 0 && args.length != 2) {
+        if (args.length != 0 && args.length != 2) {
             System.out.println("Usage: WebServer [baseDirectory] [port]");
             System.exit(1);
         }
 
         String baseDirectory = "./html";
         int port = 8080;
-        if(args.length == 2) {
+        if (args.length == 2) {
             baseDirectory = args[0];
             port = Integer.valueOf(args[1]);
         }

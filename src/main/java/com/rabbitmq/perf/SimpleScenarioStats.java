@@ -34,10 +34,10 @@ class SimpleScenarioStats extends Stats implements ScenarioStats {
     protected void report(long now) {
         if (samples.size() == IGNORE_FIRST) {
             cumulativeLatencyTotal = 0;
-            latencyCountTotal      = 0;
-            sendCountTotal         = 0;
-            recvCountTotal         = 0;
-            elapsedTotalToIgnore   = elapsedTotal;
+            latencyCountTotal = 0;
+            sendCountTotal = 0;
+            recvCountTotal = 0;
+            elapsedTotalToIgnore = elapsedTotal;
         }
 
         Map<String, Object> sample = new HashMap<String, Object>();
@@ -45,7 +45,7 @@ class SimpleScenarioStats extends Stats implements ScenarioStats {
         sample.put("send-bytes-rate", rate(sendCountInterval, elapsedInterval) * minMsgSize);
         sample.put("recv-msg-rate", rate(recvCountInterval, elapsedInterval));
         sample.put("recv-bytes-rate", rate(recvCountInterval, elapsedInterval) * minMsgSize);
-        sample.put("elapsed",   elapsedTotal);
+        sample.put("elapsed", elapsedTotal);
         if (latencyCountInterval > 0) {
             sample.put("avg-latency", intervalAverageLatency());
             sample.put("min-latency", minLatency / 1000L);

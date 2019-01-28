@@ -22,8 +22,6 @@ import io.micrometer.core.instrument.Timer;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 
 import java.time.Duration;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.DoubleAccumulator;
 import java.util.function.Consumer;
@@ -67,12 +65,12 @@ public abstract class Stats {
         metricsPrefix = metricsPrefix == null ? "" : metricsPrefix;
 
         Timer latencyTimer = Timer
-            .builder(metricsPrefix + "latency")
-            .description("message latency")
-            .publishPercentiles(0.5, 0.75, 0.95, 0.99)
-            .distributionStatisticExpiry(Duration.ofMillis(this.interval))
-            .sla()
-            .register(registry);
+                .builder(metricsPrefix + "latency")
+                .description("message latency")
+                .publishPercentiles(0.5, 0.75, 0.95, 0.99)
+                .distributionStatisticExpiry(Duration.ofMillis(this.interval))
+                .sla()
+                .register(registry);
 
         Timer confirmLatencyTimer = Timer
                 .builder(metricsPrefix + "confirm.latency")
@@ -90,7 +88,7 @@ public abstract class Stats {
         consumed = registry.gauge(metricsPrefix + "consumed", new DoubleAccumulator(accumulatorFunction, 0.0));
 
         updateLatency = useMs ? latency -> latencyTimer.record(latency, TimeUnit.MILLISECONDS) :
-            latency -> latencyTimer.record(latency, TimeUnit.NANOSECONDS);
+                latency -> latencyTimer.record(latency, TimeUnit.NANOSECONDS);
 
         updateConfirmLatency = useMs ? latency -> confirmLatencyTimer.record(latency, TimeUnit.MILLISECONDS) :
                 latency -> confirmLatencyTimer.record(latency, TimeUnit.NANOSECONDS);
